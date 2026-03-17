@@ -9,6 +9,7 @@ import com.challenge.ibk.users.repository.UserRepository;
 import com.challenge.ibk.users.validator.UserValidator;
 import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -47,6 +48,7 @@ class UserServiceImplTest {
   }
 
   @Test
+  @DisplayName("register - valid request - saves user and returns response")
   void register_success() {
     // Arrange
     UserEntity toSave = new UserEntity();
@@ -76,6 +78,7 @@ class UserServiceImplTest {
   }
 
   @Test
+  @DisplayName("register - duplicate email - throws DuplicateEmailException")
   void register_duplicateEmail_throws() {
     when(userRepository.existsByEmail(request.getEmail())).thenReturn(true);
 
@@ -90,6 +93,7 @@ class UserServiceImplTest {
   }
 
   @Test
+  @DisplayName("register - validator throws - propagates exception")
   void register_validatorThrows_propagates() {
     doThrow(new IllegalArgumentException("invalid")).when(userValidator).validate(request);
 
