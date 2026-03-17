@@ -1,0 +1,228 @@
+openapi: 3.0.3
+info:
+  title: API de Registro de Usuarios
+  version: 1.0.0
+  description: >
+    API RESTful para creación de usuarios.
+    Todos los endpoints aceptan y retornan únicamente JSON, incluyendo los errores.
+
+servers:
+  - url: http://localhost:8080
+    description: Local
+
+tags:
+  - name: Usuarios
+    description: Operaciones de registro de usuarios
+
+paths:
+  /api/users:
+    post:
+      tags:
+        - Usuarios
+      summary: Registrar usuario
+      description: >
+        Crea un nuevo usuario en el sistema.
+        Si el correo ya existe, retorna un error de negocio.
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+            examples:
+              registro-ok:
+                summary: Ejemplo de registro
+                value:
+                  name: Juan Rodriguez
+                  email: juan@dominio.cl
+                  password: Abcdef12
+                  phones:
+                    - number: "1234567"
+                      citycode: "1"
+                      contrycode: "57"
+
+      responses:
+        '201':
+          description: Usuario creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCreateResponse'
+
+        '400':
+          description: Solicitud inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                email-invalido:
+                  value:
+                    mensaje: "Formato de correo inválido"
+                password-invalida:
+                  value:
+                    mensaje: "Formato de contraseña inválido"
+                payload-invalido:
+                  value:
+                    mensaje: "Datos de entrada inválidos"
+
+        '409':
+          description: Conflicto de negocio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                correo-duplicado:
+                  value:
+                    mensaje: "El correo ya registrado"
+
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error-interno:
+                  value:
+                    mensaje: "Error interno del servidor"
+
+components:
+  schemas:
+
+    UserCreateRequest:
+      type: object
+      required:
+        - name
+        - email
+        - password
+        - phones
+      properties:
+        name:
+          type: string
+          description: Nombre completo del usuario
+          example: Juan Rodriguez
+
+        email:
+          type: string
+          description: >
+            Correo del usuario. El formato será validado en backend mediante
+            una expresión regular configurable.
+          example: juan@dominio.cl
+        password:
+          type: string
+          description: >
+            Contraseña del usuario. Será validada en backend mediante una
+            expresión regular configurable.
+          example: Abcdef12
+        phones:
+          type: array
+          description: Lista de teléfonos del usuario
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/PhoneRequest'
+
+    PhoneRequest:
+      type: object
+      required:
+        - number
+        - citycode
+        - contrycode
+      properties:
+        number:
+          type: string
+          example: "1234567"
+
+        citycode:
+          type: string
+          example: "1"
+
+        contrycode:
+          type: string
+          description: >
+            Se mantiene el nombre 'contrycode' tal como aparece en la consigna.
+          example: "57"
+
+    UserCreateResponse:
+      type: object
+      required:
+        - id
+        - created
+        - modified
+        - last_login
+        - token
+        - isactive
+        - name
+        - email
+        - phones
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+
+        created:
+          type: string
+          format: date-time
+          example: "2026-03-17T10:15:30Z"
+
+        modified:
+          type: string
+          format: date-time
+          example: "2026-03-17T10:15:30Z"
+
+        last_login:
+          type: string
+          format: date-time
+          example: "2026-03-17T10:15:30Z"
+
+        token:
+          type: string
+          example: "8a9a5c5e-bc35-4d9a-92d2-cf7cb9a6f7d4"
+
+        isactive:
+          type: boolean
+          example: true
+
+        name:
+          type: string
+          example: Juan Rodriguez
+
+        email:
+          type: string
+          example: juan@dominio.cl
+
+        phones:
+          type: array
+          items:
+            $ref: '#/components/schemas/PhoneResponse'
+
+    PhoneResponse:
+      type: object
+      required:
+        - number
+        - citycode
+        - contrycode
+      properties:
+        number:
+          type: string
+          example: "1234567"
+
+        citycode:
+          type: string
+          example: "1"
+
+        contrycode:
+          type: string
+          example: "57"
+
+    ErrorResponse:
+      type: object
+      required:
+        - mensaje
+      properties:
+        mensaje:
+          type: string
+          example: "El correo ya registrado"
