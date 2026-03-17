@@ -73,12 +73,6 @@ curl -X POST "http://localhost:8080/api/v1/usuarios" -H "Content-Type: applicati
 
 Respuesta esperada: HTTP 201 con el cuerpo `UserCreateResponse`.
 
-2) Obtener información (ejemplo de endpoint si existe)
-
-```
-curl -X GET "http://localhost:8080/api/v1/usuarios/{id}"
-```
-
 Diagrama
 - Se añadió `ARCHITECTURE.md` con un diagrama ASCII y también hay un diagrama vectorial en `docs/diagram.svg`.
 
